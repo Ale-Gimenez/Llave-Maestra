@@ -1,33 +1,20 @@
 from django.urls import path, include
-from .views import *
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
+from .views import (
+    CondominioViewSet, UnidadeViewSet, CobrancaViewSet,
+    AcordoViewSet, ParcelaAcordoViewSet,
+    DashboardView, InadimplenciaResumoView
 )
 
 router = DefaultRouter()
-router.register(r'responsaveis', ResponsaveisViewSet)
-router.register(r'locais', LocaisViewSet)
-router.register(r'ambientes', AmbientesViewSet)
-router.register(r'microcontroladores', MicrocontroladoresViewSet)
-router.register(r'sensores', SensoresViewSet)
-router.register(r'historicos', HistoricosViewSet)
-router.register(r'usuarios', UsuariosViewSet)
+router.register(r'condominios', CondominioViewSet, basename='condominio')
+router.register(r'unidades', UnidadeViewSet, basename='unidade')
+router.register(r'cobrancas', CobrancaViewSet, basename='cobranca')
+router.register(r'acordos', AcordoViewSet, basename='acordo')
+router.register(r'parcelas-acordo', ParcelaAcordoViewSet, basename='parcela-acordo')
 
 urlpatterns = [
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
-    path('register/', RegisterView.as_view(), name='register'),
-    path('me/', UsuarioMeView.as_view(), name='me'),
-
     path('', include(router.urls)),
-
-    path('importar/locais/', importar_locais),
-    path('importar/responsaveis/', importar_responsaveis),
-    path('importar/ambientes/', importar_ambientes),
-    path('importar/microcontroladores/', importar_microcontroladores),
-    path('importar/sensores/', importar_sensores),
-    path('importar/historicos/', importar_historicos),
+    path('dashboard/', DashboardView.as_view(), name='dashboard'),
+    path('inadimplencia/resumo/', InadimplenciaResumoView.as_view(), name='inadimplencia-resumo'),
 ]
