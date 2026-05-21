@@ -34,7 +34,7 @@ Edite `condominio_project/settings.py`, descomente o bloco MySQL e preencha:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'condominio_db',
+        'NAME': 'condominio',
         'USER': 'root',
         'PASSWORD': 'sua_senha',
         'HOST': 'localhost',
@@ -43,7 +43,7 @@ DATABASES = {
 }
 ```
 Também instale o driver: `pip install mysqlclient`  
-E crie o banco: `CREATE DATABASE condominio_db CHARACTER SET utf8mb4;`
+E crie o banco: `CREATE DATABASE condominio CHARACTER SET utf8mb4;`
 
 ### 5. Aplique as migrações
 ```bash

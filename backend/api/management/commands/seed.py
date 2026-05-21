@@ -1,7 +1,3 @@
-"""
-Popula o banco com dados de exemplo.
-Execute: python manage.py seed
-"""
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.utils import timezone
