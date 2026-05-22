@@ -24,12 +24,8 @@ pip install -r requirements.txt
 ```
 
 ### 4. Configure o banco de dados
-
-**SQLite (padrão, sem configuração extra):**  
-Já está configurado. Pode pular este passo.
-
-**MySQL (opcional):**  
-Edite `condominio_project/settings.py`, descomente o bloco MySQL e preencha:
+**MySQL:**  
+Edite `config/settings.py`, descomente o bloco MySQL e preencha:
 ```python
 DATABASES = {
     'default': {
@@ -249,22 +245,19 @@ Condominio (1) ──────── (N) Unidade
 ## 📁 Estrutura do projeto
 
 ```
-condominio_project/
+backend/
 ├── api/
 │   ├── migrations/
-│   ├── management/commands/seed.py
+│   ├── management/commands/seed.py   # População Automática
 │   ├── models.py        # Modelos
 │   ├── serializers.py   # Serializers com validações
 │   ├── views.py         # ViewSets + Views inteligentes
 │   ├── filters.py       # Filtros DjangoFilterBackend
 │   ├── urls.py          # Rotas (DefaultRouter)
 │   └── admin.py
-├── condominio_project/
+├── config/
 │   ├── settings.py
 │   └── urls.py
-├── fixtures/
-│   ├── api_data.json    # Fixture com dados de exemplo
-│   └── banco_de_dados.sql
 ├── requirements.txt
 └── README.md
 ```
