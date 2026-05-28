@@ -1,16 +1,52 @@
-# React + Vite
+# CondoGest — Frontend React
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface web para o sistema de gestão condominial (MVP), consumindo a API Django REST Framework.
 
-Currently, two official plugins are available:
+## Pré-requisitos
+- Node.js 18+
+- Backend Django rodando em `http://localhost:8000`
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Como rodar
 
-## React Compiler
+```bash
+# 1. Instalar dependências
+npm install
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# 2. Configurar variável de ambiente
+cp .env.example .env
+# Edite .env se o backend estiver em outra porta/host
 
-## Expanding the ESLint configuration
+# 3. Iniciar
+npm start
+# Abre em http://localhost:3000
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Telas disponíveis
+
+| Rota             | Tela                          |
+|------------------|-------------------------------|
+| `/login`         | Login com JWT                 |
+| `/dashboard`     | Visão geral financeira        |
+| `/condominios`   | CRUD de condomínios           |
+| `/unidades`      | CRUD de unidades              |
+| `/cobrancas`     | CRUD + filtros de cobranças   |
+| `/acordos`       | Acordos + parcelas            |
+| `/inadimplencia` | Relatório de inadimplência    |
+
+## Endpoints consumidos
+
+- `POST /api/token/` — login JWT
+- `GET  /api/dashboard/` — resumo financeiro
+- `GET  /api/inadimplencia/resumo/` — inadimplência por condomínio
+- CRUD: `/api/condominios/`, `/api/unidades/`, `/api/cobrancas/`, `/api/acordos/`, `/api/parcelas-acordo/`
+
+## Estrutura
+
+```
+src/
+  context/      # AuthContext, ToastContext
+  services/     # api.js (axios)
+  components/   # Layout, PrivateRoute
+  pages/        # uma página por rota
+  styles/       # CSS separado por módulo
+```

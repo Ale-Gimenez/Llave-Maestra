@@ -13,19 +13,22 @@ from .serializers import (
     CobrancaSerializer, AcordoSerializer, ParcelaAcordoSerializer
 )
 from .filters import CobrancaFilter, AcordoFilter, UnidadeFilter
+from .permissions import IsAdminOrReadOnly
 
 
 class CondominioViewSet(viewsets.ModelViewSet):
     queryset = Condominio.objects.all()
     serializer_class = CondominioSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
+    http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options']
 
 
 class UnidadeViewSet(viewsets.ModelViewSet):
     queryset = Unidade.objects.select_related('condominio').all()
     serializer_class = UnidadeSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
     filterset_class = UnidadeFilter
+    http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options']
 
     @action(detail=True, methods=['get'], url_path='resumo-financeiro')
     def resumo_financeiro(self, request, pk=None):
@@ -67,8 +70,9 @@ class UnidadeViewSet(viewsets.ModelViewSet):
 class CobrancaViewSet(viewsets.ModelViewSet):
     queryset = Cobranca.objects.select_related('unidade__condominio').all()
     serializer_class = CobrancaSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
     filterset_class = CobrancaFilter
+    http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options']
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -81,15 +85,17 @@ class CobrancaViewSet(viewsets.ModelViewSet):
 class AcordoViewSet(viewsets.ModelViewSet):
     queryset = Acordo.objects.prefetch_related('cobrancas', 'parcelas').select_related('unidade').all()
     serializer_class = AcordoSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
     filterset_class = AcordoFilter
+    http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options']
 
 
 class ParcelaAcordoViewSet(viewsets.ModelViewSet):
     queryset = ParcelaAcordo.objects.select_related('acordo__unidade').all()
     serializer_class = ParcelaAcordoSerializer
-    permission_classes = [IsAuthenticated]
-    http_method_names = ['get', 'patch', 'head', 'options']  # Parcelas são geradas pelo Acordo
+    permission_classes = [IsAdminOrReadOnly]
+    # Parcelas são geradas pelo Acordo; só admin pode atualizar via PUT ou deletar
+    http_method_names = ['get', 'put', 'delete', 'head', 'options']
 
     filterset_fields = ['acordo', 'status']
 

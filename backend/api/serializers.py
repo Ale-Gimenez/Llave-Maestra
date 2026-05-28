@@ -198,7 +198,7 @@ class AcordoSerializer(serializers.ModelSerializer):
         data_venc = acordo.data_primeiro_vencimento
 
         for i in range(1, qtd + 1):
-            # Último parcela absorve diferença de arredondamento
+            # Última parcela absorve diferença de arredondamento
             if i == qtd:
                 valor_esta_parcela = valor_total - valor_parcela * (qtd - 1)
             else:

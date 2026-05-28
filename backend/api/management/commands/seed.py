@@ -11,10 +11,40 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         self.stdout.write('Criando usuários...')
+
+        # 1. Superusuário supremo — acesso total, incluindo painel /admin/
+        if not User.objects.filter(username='superadmin').exists():
+            User.objects.create_superuser(
+                username='superadmin',
+                email='superadmin@condominio.com',
+                password='superadmin123',
+                # is_superuser=True, is_staff=True e is_active=True são definidos pelo create_superuser
+            )
+            self.stdout.write('  → superadmin criado (superuser + staff + active)')
+
+        # 2. Administrador — staff e active, mas não superuser
+        #    Pode acessar o /admin/ com permissões específicas e usar endpoints de escrita na API
         if not User.objects.filter(username='admin').exists():
-            User.objects.create_superuser('admin', 'admin@condominio.com', 'admin123')
+            admin_user = User.objects.create_user(
+                username='admin',
+                email='admin@condominio.com',
+                password='admin123',
+            )
+            admin_user.is_staff = True    # acesso ao /admin/ e escrita na API
+            admin_user.is_superuser = False
+            admin_user.is_active = True
+            admin_user.save()
+            self.stdout.write('  → admin criado (staff + active)')
+
+        # 3. Usuário normal — somente leitura na API
         if not User.objects.filter(username='user').exists():
-            User.objects.create_user('user', 'user@condominio.com', 'user123')
+            User.objects.create_user(
+                username='user',
+                email='user@condominio.com',
+                password='user123',
+                # is_superuser=False, is_staff=False, is_active=True (padrão)
+            )
+            self.stdout.write('  → user criado (active apenas)')
 
         self.stdout.write('Criando condomínios...')
         cond1, _ = Condominio.objects.get_or_create(nome='Residencial Primavera',
@@ -95,5 +125,10 @@ class Command(BaseCommand):
                     valor=v.quantize(Decimal('0.01')), data_vencimento=vd)
                 vd = vd.replace(month=vd.month % 12 + 1, year=vd.year + (1 if vd.month == 12 else 0))
 
-        self.stdout.write(self.style.SUCCESS('Seed concluído!'))
-        self.stdout.write('Acesso: admin/admin123 e user/user123')
+        self.stdout.write(self.style.SUCCESS('\n✅ Seed concluído!'))
+        self.stdout.write('=' * 50)
+        self.stdout.write('USUÁRIOS CRIADOS:')
+        self.stdout.write('  superadmin / superadmin123  → superuser + staff + active (acesso total + /admin/)')
+        self.stdout.write('  admin      / admin123       → staff + active (escrita na API + /admin/ restrito)')
+        self.stdout.write('  user       / user123        → active apenas (somente leitura na API)')
+        self.stdout.write('=' * 50)
