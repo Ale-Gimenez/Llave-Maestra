@@ -12,7 +12,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self.stdout.write('Criando usuários...')
 
-        # 1. Superusuário supremo — acesso total, incluindo painel /admin/
+        # superusuário supremo — acesso total, incluindo painel /admin/
         if not User.objects.filter(username='superadmin').exists():
             User.objects.create_superuser(
                 username='superadmin',
@@ -22,21 +22,21 @@ class Command(BaseCommand):
             )
             self.stdout.write('  → superadmin criado (superuser + staff + active)')
 
-        # 2. Administrador — staff e active, mas não superuser
-        #    Pode acessar o /admin/ com permissões específicas e usar endpoints de escrita na API
+        # Administrador — staff e active, mas não superuser
+        # Pode acessar o /admin/ com permissões específicas e usar endpoints de escrita na API
         if not User.objects.filter(username='admin').exists():
             admin_user = User.objects.create_user(
                 username='admin',
                 email='admin@condominio.com',
                 password='admin123',
             )
-            admin_user.is_staff = True    # acesso ao /admin/ e escrita na API
+            admin_user.is_staff = True    #acesso ao /admin/ e escrita na API
             admin_user.is_superuser = False
             admin_user.is_active = True
             admin_user.save()
             self.stdout.write('  → admin criado (staff + active)')
 
-        # 3. Usuário normal — somente leitura na API
+        # Usuário normal — somente leitura na API
         if not User.objects.filter(username='user').exists():
             User.objects.create_user(
                 username='user',
@@ -125,7 +125,7 @@ class Command(BaseCommand):
                     valor=v.quantize(Decimal('0.01')), data_vencimento=vd)
                 vd = vd.replace(month=vd.month % 12 + 1, year=vd.year + (1 if vd.month == 12 else 0))
 
-        self.stdout.write(self.style.SUCCESS('\n✅ Seed concluído!'))
+        self.stdout.write(self.style.SUCCESS('\nSeed concluído!'))
         self.stdout.write('=' * 50)
         self.stdout.write('USUÁRIOS CRIADOS:')
         self.stdout.write('  superadmin / superadmin123  → superuser + staff + active (acesso total + /admin/)')
