@@ -1,0 +1,38 @@
+.filter-bar { display: flex; gap: 12px; padding: 14px 16px; margin-bottom: 18px; }
+.filter-select { max-width: 240px; }
+.id-chip {
+  background: var(--slate-100); color: var(--slate-500);
+  font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+}
+.bloco-tag { color: var(--slate-400); font-size: 13px; }
+.row-actions { display: flex; gap: 6px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modal-form { display: flex; flex-direction: column; gap: 14px; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding-top: 8px; }
+
+/* Resumo */
+.resumo-grid { display: flex; flex-direction: column; gap: 16px; }
+.resumo-header { display: flex; justify-content: space-between; align-items: baseline; }
+.resumo-nome { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
+.resumo-id { font-size: 13px; color: var(--slate-400); }
+.resumo-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.rs-item {
+  background: var(--slate-50); border-radius: var(--radius-sm);
+  padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.rs-item span { font-size: 12px; color: var(--slate-400); font-weight: 700; text-transform: uppercase; }
+.rs-item strong { font-size: 24px; font-weight: 800; color: var(--slate-900); }
+.rs-item.green { background: var(--green-100); }
+.rs-item.green strong { color: var(--green-600); }
+.rs-item.yellow { background: var(--yellow-100); }
+.rs-item.yellow strong { color: var(--yellow-600); }
+.rs-item.red { background: var(--red-100); }
+.rs-item.red strong { color: var(--red-600); }
+.resumo-valor {
+  background: var(--orange-100); border: 1.5px solid var(--orange-200);
+  border-radius: var(--radius-sm); padding: 14px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.resumo-valor span { font-size: 14px; font-weight: 700; color: var(--slate-700); }
+.valor-aberto { font-size: 20px; font-weight: 800; color: var(--orange-600); }
+.resumo-acordo { font-size: 14px; display: flex; align-items: center; gap: 10px; }

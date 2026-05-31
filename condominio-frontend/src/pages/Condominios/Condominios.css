@@ -1,0 +1,24 @@
+.page-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 24px;
+}
+.section-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--slate-900); }
+.section-sub { font-size: 13px; color: var(--slate-400); margin-top: 2px; }
+
+.cond-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.cond-card { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.cond-card-header { display: flex; align-items: center; gap: 12px; }
+.cond-avatar {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--orange-500), var(--orange-600));
+  color: #fff; font-family: var(--font-display); font-weight: 800; font-size: 20px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.cond-info h3 { font-weight: 700; font-size: 15px; color: var(--slate-900); }
+.cond-cnpj { font-size: 12px; color: var(--slate-400); }
+.cond-meta { display: flex; flex-direction: column; gap: 4px; }
+.cond-meta p { font-size: 13px; color: var(--slate-500); }
+.cond-actions { display: flex; gap: 8px; margin-top: 4px; }
+
+.modal-form { display: flex; flex-direction: column; gap: 16px; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding-top: 8px; }

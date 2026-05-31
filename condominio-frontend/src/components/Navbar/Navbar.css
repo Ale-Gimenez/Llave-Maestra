@@ -1,0 +1,20 @@
+.topbar {
+  height: 62px;
+  background: #fff;
+  border-bottom: 1.5px solid var(--slate-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  flex-shrink: 0;
+}
+.topbar-left { display: flex; align-items: baseline; gap: 12px; }
+.topbar-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+.topbar-sub { font-size: 13px; color: var(--slate-400); }
+.topbar-right {}
+.topbar-date { font-size: 13px; color: var(--slate-500); font-weight: 600; }

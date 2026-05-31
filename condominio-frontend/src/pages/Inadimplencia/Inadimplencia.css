@@ -1,0 +1,16 @@
+.inadimplencia-page { display: flex; flex-direction: column; gap: 0; }
+.ina-totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+.ina-total-card {
+  border-radius: var(--radius-md); padding: 20px;
+  display: flex; align-items: center; gap: 16px;
+}
+.ina-total-card.red    { background: var(--red-100);    border: 1.5px solid #FCA5A5; }
+.ina-total-card.orange { background: var(--orange-100); border: 1.5px solid var(--orange-200); }
+.ina-total-card.slate  { background: var(--slate-100);  border: 1.5px solid var(--slate-200); }
+.itc-icon { font-size: 32px; }
+.itc-label { display: block; font-size: 12px; font-weight: 700; color: var(--slate-500); text-transform: uppercase; letter-spacing: .05em; }
+.itc-value { display: block; font-family: var(--font-display); font-size: 24px; font-weight: 800; color: var(--slate-900); }
+.ina-valor { color: var(--red-600); font-weight: 700; }
+.td-red { color: var(--red-600); font-weight: 700; }
+.acrescimos { color: var(--red-600); font-weight: 700; font-size: 13px; }
+.id-chip { background: var(--slate-100); color: var(--slate-500); font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
