@@ -30,9 +30,9 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
-        <div className="brand-icon">C</div>
+        <div className="brand-icon">L</div>
         <div className="brand-text">
-          <span className="brand-name">CondoSys</span>
+          <span className="brand-name">Llave Maestra</span>
           <span className="brand-sub">Portal Admin</span>
         </div>
       </div>

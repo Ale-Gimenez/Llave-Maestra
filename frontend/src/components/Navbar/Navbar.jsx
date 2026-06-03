@@ -23,7 +23,7 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar-left">
-        <span className="navbar-title">CondoSys</span>
+        <span className="navbar-title">Llave Maestra</span>
       </div>
       <div className="navbar-right">
         {user && (

@@ -35,7 +35,7 @@ export default function Login() {
           <p className="hero-desc">
             Controle cobranças, inadimplência e acordos de parcelamento em um único lugar.
           </p>
-          <div className="hero-features">
+          <div className="hero-desc">
             {['Cobranças automáticas', 'Controle de inadimplência', 'Acordos de parcelamento', 'Dashboard financeiro'].map(f => (
               <div key={f} className="hero-feature">
                 <span className="feature-dot" />
@@ -56,7 +56,7 @@ export default function Login() {
       <div className="login-form-side">
         <div className="login-card">
           <div className="login-logo">
-            <div className="login-logo-icon">C</div>
+            <div className="login-logo-icon">L</div>
             <span className="login-logo-text">Llave Maestra</span>
           </div>
           <h2 className="login-heading">Bem-vindo de volta</h2>
