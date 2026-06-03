@@ -52,7 +52,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# SQLite (padrão para desenvolvimento sem MySQL)
+# SQLite
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
@@ -60,7 +60,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 #     }
 # }
 
-# MySQL (descomente e configure para produção / SENAI)
+
+# MySQL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -108,7 +109,7 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# CORS — permite o frontend Vite (dev) e qualquer origem local
+# CORS
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
