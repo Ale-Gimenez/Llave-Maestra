@@ -111,9 +111,9 @@ class Acordo(models.Model):
     unidade = models.ForeignKey(
         Unidade, on_delete=models.CASCADE, related_name='acordos'
     )
+    # Removido limit_choices_to para aceitar tanto VENCIDO quanto PENDENTE
     cobrancas = models.ManyToManyField(
-        Cobranca, related_name='acordos',
-        limit_choices_to={'status': 'VENCIDO'}
+        Cobranca, related_name='acordos'
     )
     quantidade_parcelas = models.PositiveIntegerField()
     data_primeiro_vencimento = models.DateField()

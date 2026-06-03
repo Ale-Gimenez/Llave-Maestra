@@ -11,6 +11,13 @@ const navItems = [
   { to: '/acordos',       icon: '🤝', label: 'Acordos'        },
 ]
 
+function getRoleLabel(user) {
+  if (!user) return ''
+  if (user.is_superuser) return 'Superadmin'
+  if (user.is_staff) return 'Administrador'
+  return 'Somente leitura'
+}
+
 export default function Sidebar() {
   const { logout, user } = useAuth()
   const navigate = useNavigate()
@@ -49,7 +56,7 @@ export default function Sidebar() {
           <div className="user-avatar">{user?.username?.[0]?.toUpperCase() || 'U'}</div>
           <div className="user-info">
             <span className="user-name">{user?.username}</span>
-            <span className="user-role">Administrador</span>
+            <span className="user-role">{getRoleLabel(user)}</span>
           </div>
         </div>
         <button className="logout-btn" onClick={handleLogout} title="Sair">

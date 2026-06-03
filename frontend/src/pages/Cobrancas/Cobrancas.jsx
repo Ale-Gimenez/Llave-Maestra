@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getCobrancas, getUnidades, getCondominios, createCobranca, updateCobranca, deleteCobranca } from '../../api/api'
+import { useAuth } from '../../context/AuthContext'
 import Modal from '../../components/Modal/Modal'
 import StatusBadge from '../../components/StatusBadge/StatusBadge'
 import './Cobrancas.css'
@@ -10,6 +11,7 @@ function fmt(n) { return Number(n || 0).toLocaleString('pt-BR', { style: 'curren
 function fmtDate(d) { if (!d) return '—'; const [y,m,dia] = d.split('-'); return `${dia}/${m}/${y}` }
 
 export default function Cobrancas() {
+  const { canWrite } = useAuth()
   const [list, setList] = useState([])
   const [unidades, setUnidades] = useState([])
   const [condominios, setCondominios] = useState([])
@@ -59,7 +61,6 @@ export default function Cobrancas() {
   async function handlePagar(e) {
     e.preventDefault(); setSaving(true); setFormError('')
     try {
-      // PUT with all required fields
       const payload = {
         unidade_id: selected.unidade_id,
         competencia: selected.competencia,
@@ -93,13 +94,15 @@ export default function Cobrancas() {
           <h2 className="section-title">Cobranças</h2>
           <p className="section-sub">{list.length} registro{list.length !== 1 ? 's' : ''}</p>
         </div>
-        <button className="btn btn-primary" onClick={() => { setForm(EMPTY_CREATE); setFormError(''); setShowCreate(true) }}>
-          + Nova Cobrança
-        </button>
+        {canWrite() && (
+          <button className="btn btn-primary" onClick={() => { setForm(EMPTY_CREATE); setFormError(''); setShowCreate(true) }}>
+            + Nova Cobrança
+          </button>
+        )}
       </div>
 
       {/* Filtros */}
-      <div className="card filter-bar" style={{ marginBottom: 18 }}>
+      <div className="card filter-bar">
         <select className="form-control filter-select" value={filter.condominio}
           onChange={e => setFilter(p => ({ ...p, condominio: e.target.value, unidade: '' }))}>
           <option value="">Todos os condomínios</option>
@@ -108,13 +111,23 @@ export default function Cobrancas() {
         <select className="form-control filter-select" value={filter.unidade}
           onChange={e => setFilter(p => ({ ...p, unidade: e.target.value }))}>
           <option value="">Todas as unidades</option>
-          {unidades.map(u => <option key={u.id} value={u.id}>#{u.id} — {u.numero} ({u.condominio_nome})</option>)}
+          {unidades
+            .filter(u => !filter.condominio || String(u.condominio_id) === String(filter.condominio))
+            .map(u => <option key={u.id} value={u.id}>{u.numero}{u.bloco ? ` - Bloco ${u.bloco}` : ''} ({u.condominio_nome})</option>)}
         </select>
         <select className="form-control filter-select" value={filter.status}
           onChange={e => setFilter(p => ({ ...p, status: e.target.value }))}>
           <option value="">Todos os status</option>
-          {['PENDENTE','PAGO','VENCIDO','CANCELADO'].map(s => <option key={s} value={s}>{s}</option>)}
+          <option value="PENDENTE">Pendente</option>
+          <option value="PAGO">Pago</option>
+          <option value="VENCIDO">Vencido</option>
+          <option value="CANCELADO">Cancelado</option>
         </select>
+        {(filter.condominio || filter.unidade || filter.status) && (
+          <button className="btn btn-ghost btn-sm" onClick={() => setFilter({ unidade: '', status: '', condominio: '' })}>
+            ✕ Limpar filtros
+          </button>
+        )}
       </div>
 
       {list.length === 0 ? (
@@ -130,6 +143,7 @@ export default function Cobrancas() {
                 <th>Vencimento</th>
                 <th>Valor</th>
                 <th>Multa+Juros</th>
+                <th>Total</th>
                 <th>Status</th>
                 <th>Pagamento</th>
                 <th>Ações</th>
@@ -139,27 +153,32 @@ export default function Cobrancas() {
               {list.map(c => (
                 <tr key={c.id}>
                   <td><span className="id-chip">{c.id}</span></td>
-                  <td><span className="small-info">{c.unidade_info}</span></td>
+                  <td><span className="unidade-cell">{c.unidade_info}</span></td>
                   <td>{fmtDate(c.competencia)}</td>
                   <td className={c.status === 'VENCIDO' ? 'td-red' : ''}>{fmtDate(c.data_vencimento)}</td>
-                  <td><strong>{fmt(c.valor)}</strong></td>
+                  <td>{fmt(c.valor)}</td>
                   <td>
                     {(parseFloat(c.multa) + parseFloat(c.juros)) > 0
                       ? <span className="acrescimos">{fmt(parseFloat(c.multa) + parseFloat(c.juros))}</span>
-                      : <span className="zero">—</span>}
+                      : <span className="text-muted">—</span>}
                   </td>
+                  <td><strong>{fmt(c.valor_total)}</strong></td>
                   <td><StatusBadge status={c.status} /></td>
                   <td>
                     {c.data_pagamento
-                      ? <span className="pag-info">{fmtDate(c.data_pagamento)} · {c.forma_pagamento}</span>
-                      : <span className="zero">—</span>}
+                      ? <span>{fmtDate(c.data_pagamento)}<br /><small className="text-muted">{c.forma_pagamento}</small></span>
+                      : <span className="text-muted">—</span>}
                   </td>
                   <td>
                     <div className="row-actions">
-                      {(c.status === 'PENDENTE' || c.status === 'VENCIDO') && (
-                        <button className="btn btn-primary btn-sm" onClick={() => openPagar(c)}>💰 Pagar</button>
+                      {canWrite() && c.status !== 'PAGO' && c.status !== 'CANCELADO' && (
+                        <button className="btn btn-success btn-sm" onClick={() => openPagar(c)} title="Registrar pagamento">
+                          💰 Pagar
+                        </button>
                       )}
-                      <button className="btn btn-danger btn-sm" onClick={() => handleDelete(c.id)}>🗑</button>
+                      {canWrite() && (
+                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(c.id)} title="Excluir">🗑</button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -169,7 +188,7 @@ export default function Cobrancas() {
         </div>
       )}
 
-      {/* Modal criar */}
+      {/* Modal Nova Cobrança */}
       {showCreate && (
         <Modal title="Nova Cobrança" onClose={() => setShowCreate(false)}>
           {formError && <div className="alert alert-error">{formError}</div>}
@@ -178,8 +197,12 @@ export default function Cobrancas() {
               <label>Unidade *</label>
               <select className="form-control" required value={form.unidade_id}
                 onChange={e => setForm(p => ({ ...p, unidade_id: e.target.value }))}>
-                <option value="">Selecione...</option>
-                {unidades.map(u => <option key={u.id} value={u.id}>#{u.id} — {u.numero} · {u.condominio_nome}</option>)}
+                <option value="">Selecione a unidade...</option>
+                {unidades.map(u => (
+                  <option key={u.id} value={u.id}>
+                    {u.numero}{u.bloco ? ` - Bloco ${u.bloco}` : ''} — {u.responsavel} ({u.condominio_nome})
+                  </option>
+                ))}
               </select>
             </div>
             <div className="form-row">
@@ -198,43 +221,46 @@ export default function Cobrancas() {
               <div className="form-group">
                 <label>Valor (R$) *</label>
                 <input type="number" step="0.01" min="0" className="form-control" required value={form.valor}
-                  onChange={e => setForm(p => ({ ...p, valor: e.target.value }))} placeholder="0.00" />
+                  onChange={e => setForm(p => ({ ...p, valor: e.target.value }))} placeholder="850.00" />
               </div>
               <div className="form-group">
                 <label>Status</label>
                 <select className="form-control" value={form.status}
                   onChange={e => setForm(p => ({ ...p, status: e.target.value }))}>
-                  <option value="PENDENTE">PENDENTE</option>
-                  <option value="CANCELADO">CANCELADO</option>
+                  <option value="PENDENTE">Pendente</option>
+                  <option value="CANCELADO">Cancelado</option>
                 </select>
               </div>
             </div>
             <div className="form-group">
               <label>Observação</label>
-              <input className="form-control" value={form.observacao}
-                onChange={e => setForm(p => ({ ...p, observacao: e.target.value }))} placeholder="Opcional" />
+              <textarea className="form-control" rows={2} value={form.observacao}
+                onChange={e => setForm(p => ({ ...p, observacao: e.target.value }))} placeholder="Opcional..." />
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-ghost" onClick={() => setShowCreate(false)}>Cancelar</button>
-              <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Salvando...' : 'Criar'}</button>
+              <button type="submit" className="btn btn-primary" disabled={saving}>
+                {saving ? 'Salvando...' : 'Criar Cobrança'}
+              </button>
             </div>
           </form>
         </Modal>
       )}
 
-      {/* Modal pagar */}
+      {/* Modal Registrar Pagamento */}
       {showPagar && selected && (
-        <Modal title="Registrar Pagamento" onClose={() => setShowPagar(false)} width={420}>
+        <Modal title="Registrar Pagamento" onClose={() => setShowPagar(false)}>
+          {formError && <div className="alert alert-error">{formError}</div>}
           <div className="pagar-info">
-            <div className="pi-row"><span>Unidade</span><strong>{selected.unidade_info}</strong></div>
-            <div className="pi-row"><span>Valor original</span><strong>{fmt(selected.valor)}</strong></div>
-            <div className="pi-row"><span>Vencimento</span><strong className={selected.status === 'VENCIDO' ? 'text-red' : ''}>{fmtDate(selected.data_vencimento)}</strong></div>
-            {selected.status === 'VENCIDO' && (
-              <div className="pagar-aviso">⚠️ Cobrança vencida. Multa (2%) e juros (0,033%/dia) serão calculados automaticamente.</div>
+            <p><strong>Unidade:</strong> {selected.unidade_info}</p>
+            <p><strong>Competência:</strong> {fmtDate(selected.competencia)}</p>
+            <p><strong>Vencimento:</strong> {fmtDate(selected.data_vencimento)}</p>
+            <p><strong>Valor original:</strong> {fmt(selected.valor)}</p>
+            {(parseFloat(selected.multa) + parseFloat(selected.juros)) > 0 && (
+              <p className="td-red"><strong>Multa + Juros acumulados:</strong> {fmt(parseFloat(selected.multa) + parseFloat(selected.juros))}</p>
             )}
           </div>
-          {formError && <div className="alert alert-error">{formError}</div>}
-          <form onSubmit={handlePagar} className="modal-form" style={{ marginTop: 16 }}>
+          <form onSubmit={handlePagar} className="modal-form">
             <div className="form-group">
               <label>Data do Pagamento *</label>
               <input type="date" className="form-control" required value={pagarForm.data_pagamento}
@@ -244,15 +270,18 @@ export default function Cobrancas() {
               <label>Forma de Pagamento *</label>
               <select className="form-control" value={pagarForm.forma_pagamento}
                 onChange={e => setPagarForm(p => ({ ...p, forma_pagamento: e.target.value }))}>
-                <option value="PIX">PIX</option>
+                <option value="PIX">Pix</option>
                 <option value="BOLETO">Boleto</option>
                 <option value="CARTAO">Cartão</option>
                 <option value="TRANSFERENCIA">Transferência</option>
+                <option value="DINHEIRO">Dinheiro</option>
               </select>
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-ghost" onClick={() => setShowPagar(false)}>Cancelar</button>
-              <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Salvando...' : '✅ Confirmar Pagamento'}</button>
+              <button type="submit" className="btn btn-success" disabled={saving}>
+                {saving ? 'Registrando...' : '✅ Confirmar Pagamento'}
+              </button>
             </div>
           </form>
         </Modal>

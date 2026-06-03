@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     CondominioViewSet, UnidadeViewSet, CobrancaViewSet,
     AcordoViewSet, ParcelaAcordoViewSet,
-    DashboardView, InadimplenciaResumoView
+    DashboardView, InadimplenciaResumoView, MeView
 )
 
 router = DefaultRouter()
@@ -17,4 +17,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
     path('inadimplencia/resumo/', InadimplenciaResumoView.as_view(), name='inadimplencia-resumo'),
+    path('me/', MeView.as_view(), name='me'),
 ]

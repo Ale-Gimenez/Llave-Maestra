@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getUnidades, getCondominios, createUnidade, updateUnidade, deleteUnidade, getResumoFinanceiro } from '../../api/api'
+import { useAuth } from '../../context/AuthContext'
 import Modal from '../../components/Modal/Modal'
 import StatusBadge from '../../components/StatusBadge/StatusBadge'
 import './Unidades.css'
@@ -9,6 +10,7 @@ const EMPTY = { condominio_id: '', numero: '', bloco: '', responsavel: '', statu
 function fmt(n) { return Number(n).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }
 
 export default function Unidades() {
+  const { canWrite } = useAuth()
   const [list, setList] = useState([])
   const [condominios, setCondominios] = useState([])
   const [loading, setLoading] = useState(true)
@@ -44,8 +46,10 @@ export default function Unidades() {
   }
 
   async function verResumo(id) {
-    const r = await getResumoFinanceiro(id)
-    setResumo(r); setShowResumo(true)
+    try {
+      const r = await getResumoFinanceiro(id)
+      setResumo(r); setShowResumo(true)
+    } catch { alert('Erro ao carregar resumo financeiro.') }
   }
 
   async function handleSubmit(e) {
@@ -78,7 +82,9 @@ export default function Unidades() {
           <h2 className="section-title">Unidades</h2>
           <p className="section-sub">{list.length} unidade{list.length !== 1 ? 's' : ''} encontrada{list.length !== 1 ? 's' : ''}</p>
         </div>
-        <button className="btn btn-primary" onClick={openCreate}>+ Nova Unidade</button>
+        {canWrite() && (
+          <button className="btn btn-primary" onClick={openCreate}>+ Nova Unidade</button>
+        )}
       </div>
 
       {/* Filtros */}
@@ -125,8 +131,10 @@ export default function Unidades() {
                   <td>
                     <div className="row-actions">
                       <button className="btn btn-ghost btn-sm" onClick={() => verResumo(u.id)} title="Resumo financeiro">📊</button>
-                      <button className="btn btn-ghost btn-sm" onClick={() => openEdit(u)}>✏️</button>
-                      <button className="btn btn-danger btn-sm" onClick={() => handleDelete(u.id)}>🗑</button>
+                      {canWrite() && <>
+                        <button className="btn btn-ghost btn-sm" onClick={() => openEdit(u)}>✏️</button>
+                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(u.id)}>🗑</button>
+                      </>}
                     </div>
                   </td>
                 </tr>
@@ -186,7 +194,7 @@ export default function Unidades() {
 
       {/* Modal Resumo Financeiro */}
       {showResumo && resumo && (
-        <Modal title="Resumo Financeiro da Unidade" onClose={() => setShowResumo(false)} width={460}>
+        <Modal title="Resumo Financeiro da Unidade" onClose={() => setShowResumo(false)}>
           <div className="resumo-grid">
             <div className="resumo-header">
               <span className="resumo-nome">{resumo.responsavel}</span>
@@ -203,7 +211,7 @@ export default function Unidades() {
               <strong className="valor-aberto">{fmt(resumo.valor_em_aberto)}</strong>
             </div>
             <div className="resumo-acordo">
-              Possui acordo ativo: <StatusBadge status={resumo.possui_acordo ? 'ATIVO' : 'VAGO'} />
+              Possui acordo ativo: <StatusBadge status={resumo.possui_acordo ? 'ATIVO' : 'INATIVO'} />
             </div>
           </div>
         </Modal>

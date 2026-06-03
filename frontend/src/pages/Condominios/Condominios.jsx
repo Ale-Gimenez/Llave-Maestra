@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { getCondominios, createCondominio, updateCondominio, deleteCondominio } from '../../api/api'
+import { useAuth } from '../../context/AuthContext'
 import Modal from '../../components/Modal/Modal'
 import './Condominios.css'
 
 const EMPTY = { nome: '', cnpj: '', endereco: '' }
 
 export default function Condominios() {
+  const { canWrite } = useAuth()
   const [list, setList] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -53,7 +55,9 @@ export default function Condominios() {
           <h2 className="section-title">Condomínios cadastrados</h2>
           <p className="section-sub">{list.length} empreendimento{list.length !== 1 ? 's' : ''}</p>
         </div>
-        <button className="btn btn-primary" onClick={openCreate}>+ Novo Condomínio</button>
+        {canWrite() && (
+          <button className="btn btn-primary" onClick={openCreate}>+ Novo Condomínio</button>
+        )}
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
@@ -75,10 +79,12 @@ export default function Condominios() {
                 {c.endereco && <p>📍 {c.endereco}</p>}
                 <p>🚪 <strong>{c.total_unidades}</strong> unidade{c.total_unidades !== 1 ? 's' : ''}</p>
               </div>
-              <div className="cond-actions">
-                <button className="btn btn-ghost btn-sm" onClick={() => openEdit(c)}>✏️ Editar</button>
-                <button className="btn btn-danger btn-sm" onClick={() => handleDelete(c.id)}>🗑 Excluir</button>
-              </div>
+              {canWrite() && (
+                <div className="cond-actions">
+                  <button className="btn btn-ghost btn-sm" onClick={() => openEdit(c)}>✏️ Editar</button>
+                  <button className="btn btn-danger btn-sm" onClick={() => handleDelete(c.id)}>🗑 Excluir</button>
+                </div>
+              )}
             </div>
           ))}
         </div>

@@ -11,7 +11,11 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem('access_token')
     const savedUser = localStorage.getItem('user_info')
     if (token && savedUser) {
-      try { setUser(JSON.parse(savedUser)) } catch { /* ignore */ }
+      try {
+        setUser(JSON.parse(savedUser))
+      } catch {
+        localStorage.removeItem('user_info')
+      }
     }
     setLoading(false)
   }, [])
@@ -20,7 +24,22 @@ export function AuthProvider({ children }) {
     const data = await apiLogin(username, password)
     localStorage.setItem('access_token', data.access)
     localStorage.setItem('refresh_token', data.refresh)
-    const userInfo = { username }
+
+    // Fetch user info from /api/me/ to get is_staff
+    const meRes = await fetch('/api/me/', {
+      headers: { Authorization: `Bearer ${data.access}` }
+    })
+    let userInfo = { username }
+    if (meRes.ok) {
+      const meData = await meRes.json()
+      userInfo = {
+        id: meData.id,
+        username: meData.username,
+        email: meData.email,
+        is_staff: meData.is_staff,
+        is_superuser: meData.is_superuser,
+      }
+    }
     localStorage.setItem('user_info', JSON.stringify(userInfo))
     setUser(userInfo)
     return data
@@ -33,13 +52,11 @@ export function AuthProvider({ children }) {
     setUser(null)
   }
 
-  const isStaff = () => {
-    // Decoded from token would be ideal; for now treat all logged-in as potential staff
-    return !!user
-  }
+  // Retorna true se o usuário pode escrever (staff ou superuser)
+  const canWrite = () => !!(user && (user.is_staff || user.is_superuser))
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, isStaff }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, canWrite }}>
       {children}
     </AuthContext.Provider>
   )

@@ -20,7 +20,7 @@ class CondominioViewSet(viewsets.ModelViewSet):
     queryset = Condominio.objects.all()
     serializer_class = CondominioSerializer
     permission_classes = [IsAdminOrReadOnly]
-    http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options']
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
 
 
 class UnidadeViewSet(viewsets.ModelViewSet):
@@ -28,7 +28,7 @@ class UnidadeViewSet(viewsets.ModelViewSet):
     serializer_class = UnidadeSerializer
     permission_classes = [IsAdminOrReadOnly]
     filterset_class = UnidadeFilter
-    http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options']
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
 
     @action(detail=True, methods=['get'], url_path='resumo-financeiro')
     def resumo_financeiro(self, request, pk=None):
@@ -72,7 +72,7 @@ class CobrancaViewSet(viewsets.ModelViewSet):
     serializer_class = CobrancaSerializer
     permission_classes = [IsAdminOrReadOnly]
     filterset_class = CobrancaFilter
-    http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options']
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -87,15 +87,15 @@ class AcordoViewSet(viewsets.ModelViewSet):
     serializer_class = AcordoSerializer
     permission_classes = [IsAdminOrReadOnly]
     filterset_class = AcordoFilter
-    http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options']
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
 
 
 class ParcelaAcordoViewSet(viewsets.ModelViewSet):
     queryset = ParcelaAcordo.objects.select_related('acordo__unidade').all()
     serializer_class = ParcelaAcordoSerializer
     permission_classes = [IsAdminOrReadOnly]
-    # Parcelas são geradas pelo Acordo; só admin pode atualizar via PUT ou deletar
-    http_method_names = ['get', 'put', 'delete', 'head', 'options']
+    # Parcelas são geradas pelo Acordo; somente admin pode atualizar via PUT/PATCH ou deletar
+    http_method_names = ['get', 'put', 'patch', 'delete', 'head', 'options']
 
     filterset_fields = ['acordo', 'status']
 
@@ -178,3 +178,18 @@ class InadimplenciaResumoView(APIView):
             })
 
         return Response(resultado)
+
+
+class MeView(APIView):
+    """GET /api/me/ — retorna informações do usuário autenticado incluindo is_staff"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        return Response({
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'is_staff': user.is_staff,
+            'is_superuser': user.is_superuser,
+        })

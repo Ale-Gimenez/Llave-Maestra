@@ -1,28 +1,42 @@
-import { useLocation } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 import './Navbar.css'
 
-const titles = {
-  '/':              { title: 'Dashboard',     sub: 'Visão geral do sistema' },
-  '/condominios':   { title: 'Condomínios',   sub: 'Cadastro de empreendimentos' },
-  '/unidades':      { title: 'Unidades',      sub: 'Gerenciamento de unidades' },
-  '/cobrancas':     { title: 'Cobranças',     sub: 'Emissão e controle de receitas' },
-  '/inadimplencia': { title: 'Inadimplência', sub: 'Resumo por condomínio' },
-  '/acordos':       { title: 'Acordos',       sub: 'Parcelamentos negociados' },
-}
-
 export default function Navbar() {
-  const { pathname } = useLocation()
-  const info = titles[pathname] || { title: 'CondoSys', sub: '' }
-  const today = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })
+  const { user, logout, canWrite } = useAuth()
+  const navigate = useNavigate()
+
+  function handleLogout() {
+    logout()
+    navigate('/login')
+  }
+
+  const roleBadge = () => {
+    if (!user) return null
+    if (user.is_superuser) return { label: 'Superadmin', cls: 'role-super' }
+    if (user.is_staff)     return { label: 'Admin', cls: 'role-admin' }
+    return { label: 'Somente leitura', cls: 'role-user' }
+  }
+
+  const badge = roleBadge()
 
   return (
-    <header className="topbar">
-      <div className="topbar-left">
-        <h1 className="topbar-title">{info.title}</h1>
-        <span className="topbar-sub">{info.sub}</span>
+    <header className="navbar">
+      <div className="navbar-left">
+        <span className="navbar-title">CondoSys</span>
       </div>
-      <div className="topbar-right">
-        <span className="topbar-date">📅 {today}</span>
+      <div className="navbar-right">
+        {user && (
+          <>
+            <div className="user-info">
+              <span className="user-name">{user.username}</span>
+              {badge && <span className={`role-badge ${badge.cls}`}>{badge.label}</span>}
+            </div>
+            <button className="btn btn-ghost btn-sm logout-btn" onClick={handleLogout}>
+              Sair
+            </button>
+          </>
+        )}
       </div>
     </header>
   )

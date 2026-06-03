@@ -57,7 +57,7 @@ export default function Login() {
         <div className="login-card">
           <div className="login-logo">
             <div className="login-logo-icon">C</div>
-            <span className="login-logo-text">CondoSys</span>
+            <span className="login-logo-text">Llave Maestra</span>
           </div>
           <h2 className="login-heading">Bem-vindo de volta</h2>
           <p className="login-subheading">Acesse o painel administrativo</p>
