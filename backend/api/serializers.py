@@ -70,13 +70,11 @@ class CobrancaSerializer(serializers.ModelSerializer):
         status = data.get('status', getattr(self.instance, 'status', 'PENDENTE'))
         data_pagamento = data.get('data_pagamento', getattr(self.instance, 'data_pagamento', None))
 
-        # data_pagamento obrigatória quando PAGO
         if status == 'PAGO' and not data_pagamento:
             raise serializers.ValidationError(
                 {'data_pagamento': 'Campo obrigatório quando status é PAGO.'}
             )
 
-        # forma_pagamento recomendada quando PAGO
         forma = data.get('forma_pagamento', getattr(self.instance, 'forma_pagamento', None))
         if status == 'PAGO' and not forma:
             raise serializers.ValidationError(
@@ -90,7 +88,6 @@ class CobrancaSerializer(serializers.ModelSerializer):
         data_pagamento = validated_data.get('data_pagamento', instance.data_pagamento)
         data_vencimento = validated_data.get('data_vencimento', instance.data_vencimento)
 
-        # Calcular multa/juros se pagou após o vencimento
         if status == 'PAGO' and data_pagamento and data_pagamento > data_vencimento:
             valor = validated_data.get('valor', instance.valor)
             dias = (data_pagamento - data_vencimento).days
@@ -139,10 +136,8 @@ class ParcelaAcordoSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'numero_parcela', 'valor', 'data_vencimento']
 
     def update(self, instance, validated_data):
-        # Remove forma_pagamento antes de salvar (não existe no model de parcela)
         forma_pagamento = validated_data.pop('forma_pagamento', None)
         instance = super().update(instance, validated_data)
-        # Guarda temporariamente para uso no perform_update da view
         instance._forma_pagamento = forma_pagamento
         return instance
 
@@ -176,7 +171,6 @@ class AcordoSerializer(serializers.ModelSerializer):
                 {'cobrancas_ids': 'Informe ao menos uma cobrança vencida.'}
             )
 
-        # Todas as cobranças devem ser da mesma unidade
         for c in cobrancas:
             if c.unidade_id != unidade.id:
                 raise serializers.ValidationError(
@@ -211,7 +205,6 @@ class AcordoSerializer(serializers.ModelSerializer):
         data_venc = acordo.data_primeiro_vencimento
 
         for i in range(1, qtd + 1):
-            # Última parcela absorve diferença de arredondamento
             if i == qtd:
                 valor_esta_parcela = valor_total - valor_parcela * (qtd - 1)
             else:
@@ -223,7 +216,6 @@ class AcordoSerializer(serializers.ModelSerializer):
                 valor=valor_esta_parcela.quantize(Decimal('0.01')),
                 data_vencimento=data_venc,
             )
-            # Próximo mês
             if data_venc.month == 12:
                 data_venc = data_venc.replace(year=data_venc.year + 1, month=1)
             else:
