@@ -88,7 +88,6 @@ class Cobranca(models.Model):
         return f'Cobrança {self.competencia} - {self.unidade} [{self.status}]'
 
     def calcular_multa_juros(self, data_pagamento=None):
-        """Calcula multa (2%) e juros (0,033% ao dia) sobre o valor original."""
         data_ref = data_pagamento or timezone.localdate()
         if data_ref > self.data_vencimento:
             dias_atraso = (data_ref - self.data_vencimento).days
@@ -101,7 +100,6 @@ class Cobranca(models.Model):
         return self.valor + self.multa + self.juros
 
     def atualizar_status_vencido(self):
-        """Marca como VENCIDO se passou do vencimento e ainda está PENDENTE."""
         if self.status == 'PENDENTE' and timezone.localdate() > self.data_vencimento:
             self.status = 'VENCIDO'
             self.save(update_fields=['status'])
@@ -111,7 +109,6 @@ class Acordo(models.Model):
     unidade = models.ForeignKey(
         Unidade, on_delete=models.CASCADE, related_name='acordos'
     )
-    # Removido limit_choices_to para aceitar tanto VENCIDO quanto PENDENTE
     cobrancas = models.ManyToManyField(
         Cobranca, related_name='acordos'
     )
