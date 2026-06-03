@@ -1,58 +1,106 @@
+/* ── Grid de cards ──────────────────────────────────────────── */
 .acordos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   gap: 16px;
 }
 
+/* ── Card do acordo ─────────────────────────────────────────── */
 .acordo-card {
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  transition: box-shadow 0.15s;
+}
+
+.acordo-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.acordo-quitado {
+  border-left: 4px solid var(--green-600);
+  background: linear-gradient(to right, #f0fdf4, #fff);
 }
 
 .acordo-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 8px;
+}
+
+.acordo-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
 }
 
 .acordo-id {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-weight: 600;
+  font-size: 0.72rem;
+  color: var(--slate-400);
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  display: block;
 }
 
 .acordo-unidade {
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 0.92rem;
+  font-weight: 700;
   margin: 2px 0 0;
-  color: var(--text);
+  color: var(--slate-900);
 }
 
 .acordo-valor {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--orange-500);
 }
 
-.acordo-meta {
+/* ── Barra de progresso no card ─────────────────────────────── */
+.parcelas-progress {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 0.82rem;
-  color: var(--text-muted);
+}
+
+.parcelas-progress-bar {
+  height: 7px;
+  background: var(--slate-200);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.parcelas-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-600), #22c55e);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+.parcelas-progress-label {
+  font-size: 0.76rem;
+  color: var(--slate-500);
+}
+
+/* ── Meta do card ───────────────────────────────────────────── */
+.acordo-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.8rem;
+  color: var(--slate-500);
 }
 
 .acordo-obs {
-  font-size: 0.82rem;
-  color: var(--text-muted);
+  font-size: 0.8rem;
+  color: var(--slate-500);
   font-style: italic;
   margin: 0;
   padding: 8px 10px;
-  background: var(--surface-2);
+  background: var(--slate-100);
   border-radius: 6px;
 }
 
@@ -62,13 +110,125 @@
   margin-top: 4px;
 }
 
+/* ── Modal detalhe / parcelas ───────────────────────────────── */
+.detail-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: var(--slate-50);
+  border-radius: 8px;
+  border: 1px solid var(--slate-200);
+}
+
+.detail-info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  gap: 12px;
+}
+
+.detail-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-progress-bar {
+  height: 8px;
+  background: var(--slate-200);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.detail-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-600), #22c55e);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+.detail-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: var(--slate-500);
+}
+
+/* ── Tabela de parcelas ─────────────────────────────────────── */
+.parcelas-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.parcelas-table th {
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: var(--slate-500);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 2px solid var(--slate-200);
+}
+
+.parcelas-table td {
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--slate-100);
+  vertical-align: middle;
+}
+
+.parcelas-table tr:last-child td {
+  border-bottom: none;
+}
+
+.tr-pago td {
+  background: #f0fdf4;
+  color: var(--slate-500);
+}
+
+.pago-check {
+  font-size: 1rem;
+}
+
+/* ── Modal pagar parcela ────────────────────────────────────── */
+.pagar-parcela-info {
+  background: var(--slate-50);
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.ppi-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+.ppi-row span {
+  color: var(--slate-500);
+}
+
+.ppi-valor {
+  font-size: 1.1rem;
+  color: var(--orange-500);
+}
+
+/* ── Criar acordo: lista de cobranças ───────────────────────── */
 .cobrancas-check-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
   max-height: 220px;
   overflow-y: auto;
-  border: 1px solid var(--border);
+  border: 1px solid var(--slate-200);
   border-radius: 8px;
   padding: 8px;
 }
@@ -85,12 +245,12 @@
 }
 
 .cob-check-item:hover {
-  background: var(--surface-2);
+  background: var(--slate-100);
 }
 
 .cob-check-item.selected {
-  border-color: var(--primary);
-  background: var(--primary-bg);
+  border-color: var(--orange-500);
+  background: var(--orange-100);
 }
 
 .cob-check-info {
@@ -105,49 +265,21 @@
 .cob-total {
   margin-top: 8px;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: var(--slate-500);
 }
 
 .form-hint {
   display: block;
   margin-top: 4px;
   font-size: 0.78rem;
-  color: var(--primary);
+  color: var(--orange-500);
 }
 
 .alert-info {
-  background: var(--primary-bg);
-  color: var(--primary);
-  border: 1px solid var(--primary);
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
   border-radius: 8px;
   padding: 10px 14px;
   font-size: 0.85rem;
-}
-
-.detail-header {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 16px;
-  font-size: 0.875rem;
-}
-
-.parcelas-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-}
-
-.parcelas-table th,
-.parcelas-table td {
-  padding: 8px 10px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-}
-
-.parcelas-table th {
-  font-weight: 600;
-  color: var(--text-muted);
-  font-size: 0.78rem;
-  text-transform: uppercase;
 }

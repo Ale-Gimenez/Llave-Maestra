@@ -53,25 +53,25 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # SQLite (padrão para desenvolvimento sem MySQL)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-# MySQL (descomente e configure para produção / SENAI)
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'condominio',
-#         'USER': 'root',
-#         'PASSWORD': 'senai',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#         'OPTIONS': {'charset': 'utf8mb4'},
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+# MySQL (descomente e configure para produção / SENAI)
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'condominio',
+        'USER': 'root',
+        'PASSWORD': 'senai',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {'charset': 'utf8mb4'},
+    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
