@@ -1,6 +1,3 @@
--- CondoSys Database Export
--- Generated automatically
-
 BEGIN TRANSACTION;
 CREATE TABLE "api_acordo" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "quantidade_parcelas" integer unsigned NOT NULL CHECK ("quantidade_parcelas" >= 0), "data_primeiro_vencimento" date NOT NULL, "valor_total" decimal NOT NULL, "observacao" text NOT NULL, "criado_em" datetime NOT NULL, "unidade_id" bigint NOT NULL REFERENCES "api_unidade" ("id") DEFERRABLE INITIALLY DEFERRED);
 INSERT INTO "api_acordo" VALUES(1,3,'2026-06-13',1700,'Acordo referente às cobranças vencidas','2026-06-03 10:38:05.089410',1);
