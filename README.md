@@ -1,4 +1,4 @@
-# Llave Maestra — Sistema de Cobranças e Inadimplência Condominial
+# 🏢 Llave Maestra — Sistema de Cobranças e Inadimplência Condominial
 
 Aplicação web fullstack para gestão de condomínios, cobranças, inadimplência e acordos de parcelamento.
 
