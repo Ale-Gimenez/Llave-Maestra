@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { getAcordos, getUnidades, getCobrancas, createAcordo, deleteAcordo, patchParcela } from '../../api/api'
 import { useAuth } from '../../context/AuthContext'
 import Modal from '../../components/Modal/Modal'
@@ -18,6 +19,7 @@ function statusAcordo(parcelas) {
 
 export default function Acordos() {
   const { canWrite } = useAuth()
+  const location = useLocation()
   const [list, setList] = useState([])
   const [unidades, setUnidades] = useState([])
   const [cobrancasDisp, setCobrancasDisp] = useState([])
@@ -32,7 +34,7 @@ export default function Acordos() {
   // Modal pagar parcela
   const [showPagarParcela, setShowPagarParcela] = useState(false)
   const [parcelaSelecionada, setParcelaSelecionada] = useState(null)
-  const [pagarForm, setPagarForm] = useState({ data_pagamento: '' })
+  const [pagarForm, setPagarForm] = useState({ data_pagamento: '', forma_pagamento: 'PIX' })
   const [savingParcela, setSavingParcela] = useState(false)
   const [parcelaError, setParcelaError] = useState('')
 
@@ -51,6 +53,19 @@ export default function Acordos() {
       .finally(() => setLoading(false))
   }
   useEffect(() => { load() }, [filterUnidade])
+
+  // Abre detalhes automaticamente se vier da página de cobranças
+  useEffect(() => {
+    const acordoId = location.state?.acordoId
+    if (acordoId && list.length > 0) {
+      const acordo = list.find(a => a.id === acordoId)
+      if (acordo) {
+        openDetail(acordo)
+        // Limpa o state para não reabrir ao recarregar filtro
+        window.history.replaceState({}, '')
+      }
+    }
+  }, [list, location.state])
 
   async function onUnidadeChange(uid) {
     setForm(p => ({ ...p, unidade_id: uid, cobrancas_ids: [] }))
@@ -100,7 +115,7 @@ export default function Acordos() {
   // Abre modal para pagar uma parcela específica
   function openPagarParcela(parcela) {
     setParcelaSelecionada(parcela)
-    setPagarForm({ data_pagamento: today() })
+    setPagarForm({ data_pagamento: today(), forma_pagamento: 'PIX' })
     setParcelaError('')
     setShowPagarParcela(true)
   }
@@ -112,6 +127,7 @@ export default function Acordos() {
       await patchParcela(parcelaSelecionada.id, {
         status: 'PAGO',
         data_pagamento: pagarForm.data_pagamento,
+        forma_pagamento: pagarForm.forma_pagamento,
       })
       setShowPagarParcela(false)
 
@@ -397,8 +413,22 @@ export default function Acordos() {
                 className="form-control"
                 required
                 value={pagarForm.data_pagamento}
-                onChange={e => setPagarForm({ data_pagamento: e.target.value })}
+                onChange={e => setPagarForm(p => ({ ...p, data_pagamento: e.target.value }))}
               />
+            </div>
+            <div className="form-group">
+              <label>Forma de Pagamento *</label>
+              <select
+                className="form-control"
+                value={pagarForm.forma_pagamento}
+                onChange={e => setPagarForm(p => ({ ...p, forma_pagamento: e.target.value }))}
+              >
+                <option value="PIX">Pix</option>
+                <option value="BOLETO">Boleto</option>
+                <option value="CARTAO">Cartão</option>
+                <option value="TRANSFERENCIA">Transferência</option>
+                <option value="DINHEIRO">Dinheiro</option>
+              </select>
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-ghost" onClick={() => setShowPagarParcela(false)}>Cancelar</button>

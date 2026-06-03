@@ -124,14 +124,27 @@ class ParcelaAcordoSerializer(serializers.ModelSerializer):
     acordo_id = serializers.PrimaryKeyRelatedField(
         queryset=Acordo.objects.all(), source='acordo', read_only=False, required=False
     )
+    forma_pagamento = serializers.ChoiceField(
+        choices=['PIX', 'BOLETO', 'CARTAO', 'TRANSFERENCIA', 'DINHEIRO'],
+        write_only=True, required=False, allow_blank=True
+    )
 
     class Meta:
         model = ParcelaAcordo
         fields = [
             'id', 'acordo_id', 'numero_parcela',
-            'valor', 'data_vencimento', 'data_pagamento', 'status'
+            'valor', 'data_vencimento', 'data_pagamento', 'status',
+            'forma_pagamento'
         ]
         read_only_fields = ['id', 'numero_parcela', 'valor', 'data_vencimento']
+
+    def update(self, instance, validated_data):
+        # Remove forma_pagamento antes de salvar (não existe no model de parcela)
+        forma_pagamento = validated_data.pop('forma_pagamento', None)
+        instance = super().update(instance, validated_data)
+        # Guarda temporariamente para uso no perform_update da view
+        instance._forma_pagamento = forma_pagamento
+        return instance
 
 
 class AcordoSerializer(serializers.ModelSerializer):

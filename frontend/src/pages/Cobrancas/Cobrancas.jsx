@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { getCobrancas, getUnidades, getCondominios, createCobranca, updateCobranca, deleteCobranca } from '../../api/api'
+import { useNavigate } from 'react-router-dom'
+import { getCobrancas, getUnidades, getCondominios, createCobranca, updateCobranca, deleteCobranca, getAcordos } from '../../api/api'
 import { useAuth } from '../../context/AuthContext'
 import Modal from '../../components/Modal/Modal'
 import StatusBadge from '../../components/StatusBadge/StatusBadge'
@@ -12,6 +13,7 @@ function fmtDate(d) { if (!d) return '—'; const [y,m,dia] = d.split('-'); retu
 
 export default function Cobrancas() {
   const { canWrite } = useAuth()
+  const navigate = useNavigate()
   const [list, setList] = useState([])
   const [unidades, setUnidades] = useState([])
   const [condominios, setCondominios] = useState([])
@@ -24,6 +26,8 @@ export default function Cobrancas() {
   const [pagarForm, setPagarForm] = useState({ data_pagamento: '', forma_pagamento: 'PIX' })
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
+  // Mapa cobrancaId -> acordoId para cobranças com acordo ativo
+  const [acordosMap, setAcordosMap] = useState({})
 
   function buildParams() {
     const p = []
@@ -35,8 +39,22 @@ export default function Cobrancas() {
 
   const load = () => {
     setLoading(true)
-    Promise.all([getCobrancas(buildParams()), getUnidades(), getCondominios()])
-      .then(([c, u, co]) => { setList(c); setUnidades(u); setCondominios(co) })
+    Promise.all([getCobrancas(buildParams()), getUnidades(), getCondominios(), getAcordos()])
+      .then(([c, u, co, acordos]) => {
+        setList(c)
+        setUnidades(u)
+        setCondominios(co)
+        // Monta mapa cobrancaId -> acordoId para acordos não quitados
+        const mapa = {}
+        acordos.forEach(a => {
+          const parcelas = a.parcelas || []
+          const quitado = parcelas.length > 0 && parcelas.every(p => p.status === 'PAGO')
+          if (!quitado) {
+            (a.cobrancas_ids || []).forEach(cid => { mapa[cid] = a.id })
+          }
+        })
+        setAcordosMap(mapa)
+      })
       .finally(() => setLoading(false))
   }
   useEffect(() => { load() }, [filter])
@@ -172,9 +190,20 @@ export default function Cobrancas() {
                   <td>
                     <div className="row-actions">
                       {canWrite() && c.status !== 'PAGO' && c.status !== 'CANCELADO' && (
-                        <button className="btn btn-success btn-sm" onClick={() => openPagar(c)} title="Registrar pagamento">
-                          💰 Pagar
-                        </button>
+                        acordosMap[c.id]
+                          ? (
+                            <button
+                              className="btn btn-primary btn-sm"
+                              onClick={() => navigate('/acordos', { state: { acordoId: acordosMap[c.id] } })}
+                              title="Esta cobrança possui um acordo ativo — pague por lá"
+                            >
+                              🤝 Ir ao Acordo
+                            </button>
+                          ) : (
+                            <button className="btn btn-success btn-sm" onClick={() => openPagar(c)} title="Registrar pagamento">
+                              💰 Pagar
+                            </button>
+                          )
                       )}
                       {canWrite() && (
                         <button className="btn btn-danger btn-sm" onClick={() => handleDelete(c.id)} title="Excluir">🗑</button>

@@ -99,6 +99,72 @@ class ParcelaAcordoViewSet(viewsets.ModelViewSet):
 
     filterset_fields = ['acordo', 'status']
 
+    def perform_update(self, serializer):
+        """
+        Ao marcar uma parcela como PAGO:
+        - Distribui o pagamento nas cobranças vinculadas ao acordo proporcionalmente.
+        - Se TODAS as parcelas do acordo estiverem pagas, marca todas as cobranças como PAGO.
+        - Se apenas algumas parcelas estiverem pagas, atualiza as cobranças parcialmente
+          (marca como PAGO as cobranças cujo valor já foi coberto pelas parcelas pagas).
+        """
+        parcela = serializer.save()
+        novo_status = parcela.status
+
+        if novo_status != 'PAGO':
+            return
+
+        acordo = parcela.acordo
+        data_pagamento = parcela.data_pagamento or timezone.localdate()
+        forma_pagamento = getattr(parcela, '_forma_pagamento', None)
+
+        # Verifica se todas as parcelas do acordo estão pagas agora
+        total_parcelas = acordo.parcelas.count()
+        parcelas_pagas = acordo.parcelas.filter(status='PAGO').count()
+        acordo_quitado = (total_parcelas == parcelas_pagas)
+
+        cobrancas = list(acordo.cobrancas.all())
+
+        if acordo_quitado:
+            # Acordo quitado: marca todas as cobranças como PAGO
+            for cob in cobrancas:
+                if cob.status not in ('PAGO', 'CANCELADO'):
+                    update_fields = {
+                        'status': 'PAGO',
+                        'data_pagamento': data_pagamento,
+                        'multa': Decimal('0.00'),
+                        'juros': Decimal('0.00'),
+                    }
+                    if forma_pagamento:
+                        update_fields['forma_pagamento'] = forma_pagamento
+                    for attr, val in update_fields.items():
+                        setattr(cob, attr, val)
+                    cob.save(update_fields=list(update_fields.keys()))
+        else:
+            # Acordo parcialmente pago: distribui valor das parcelas pagas nas cobranças
+            valor_pago_total = acordo.parcelas.filter(status='PAGO').aggregate(
+                total=Sum('valor')
+            )['total'] or Decimal('0.00')
+
+            valor_acumulado = Decimal('0.00')
+            for cob in cobrancas:
+                if cob.status in ('PAGO', 'CANCELADO'):
+                    continue
+                valor_cob = cob.valor + cob.multa + cob.juros
+                valor_acumulado += valor_cob
+                if valor_acumulado <= valor_pago_total:
+                    # Esta cobrança foi integralmente coberta pelas parcelas pagas
+                    update_fields = {
+                        'status': 'PAGO',
+                        'data_pagamento': data_pagamento,
+                        'multa': Decimal('0.00'),
+                        'juros': Decimal('0.00'),
+                    }
+                    if forma_pagamento:
+                        update_fields['forma_pagamento'] = forma_pagamento
+                    for attr, val in update_fields.items():
+                        setattr(cob, attr, val)
+                    cob.save(update_fields=list(update_fields.keys()))
+
 
 # --- Endpoints inteligentes ---
 
