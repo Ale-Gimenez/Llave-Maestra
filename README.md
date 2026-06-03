@@ -4,7 +4,7 @@ Aplicação web fullstack para gestão de condomínios, cobranças, inadimplênc
 
 **Backend:** Django 6 + Django REST Framework + JWT  
 **Frontend:** React 18 + Vite + CSS puro  
-**Banco:** SQLite (desenvolvimento) / MySQL (produção)
+**Banco:** MySQL (produção) / SQLite (configurável)
 
 ---
 
