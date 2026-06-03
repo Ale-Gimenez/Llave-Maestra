@@ -36,7 +36,6 @@ class UnidadeViewSet(viewsets.ModelViewSet):
         unidade = self.get_object()
         cobrancas = unidade.cobrancas.all()
 
-        # Atualizar status de cobranças vencidas antes de retornar
         hoje = timezone.localdate()
         cobrancas.filter(
             status='PENDENTE', data_vencimento__lt=hoje
@@ -76,7 +75,6 @@ class CobrancaViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        # Auto-atualiza PENDENTE → VENCIDO na listagem
         hoje = timezone.localdate()
         qs.filter(status='PENDENTE', data_vencimento__lt=hoje).update(status='VENCIDO')
         return qs
@@ -100,13 +98,6 @@ class ParcelaAcordoViewSet(viewsets.ModelViewSet):
     filterset_fields = ['acordo', 'status']
 
     def perform_update(self, serializer):
-        """
-        Ao marcar uma parcela como PAGO:
-        - Distribui o pagamento nas cobranças vinculadas ao acordo proporcionalmente.
-        - Se TODAS as parcelas do acordo estiverem pagas, marca todas as cobranças como PAGO.
-        - Se apenas algumas parcelas estiverem pagas, atualiza as cobranças parcialmente
-          (marca como PAGO as cobranças cujo valor já foi coberto pelas parcelas pagas).
-        """
         parcela = serializer.save()
         novo_status = parcela.status
 
@@ -166,10 +157,9 @@ class ParcelaAcordoViewSet(viewsets.ModelViewSet):
                     cob.save(update_fields=list(update_fields.keys()))
 
 
-# --- Endpoints inteligentes ---
+# Endpoints inteligentes
 
 class DashboardView(APIView):
-    """GET /api/dashboard/"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -209,7 +199,6 @@ class DashboardView(APIView):
 
 
 class InadimplenciaResumoView(APIView):
-    """GET /api/inadimplencia/resumo/"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -247,7 +236,6 @@ class InadimplenciaResumoView(APIView):
 
 
 class MeView(APIView):
-    """GET /api/me/ — retorna informações do usuário autenticado incluindo is_staff"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
