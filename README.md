@@ -1,4 +1,4 @@
-# CondoSys — Sistema de Cobranças e Inadimplência Condominial
+# Llave Maestra — Sistema de Cobranças e Inadimplência Condominial
 
 Aplicação web fullstack para gestão de condomínios, cobranças, inadimplência e acordos de parcelamento.
 
@@ -24,9 +24,9 @@ Aplicação web fullstack para gestão de condomínios, cobranças, inadimplênc
 cd backend
 
 # 1. Criar e ativar ambiente virtual
-python -m venv venv
-source venv/bin/activate       # Linux/Mac
-venv\Scripts\activate          # Windows
+python -m venv env
+source env/bin/activate       # Linux/Mac
+env\Scripts\activate          # Windows
 
 # 2. Instalar dependências
 pip install -r requirements.txt
@@ -218,6 +218,6 @@ Condominio (1) ──< Unidade (1) ──< Cobranca
 
 ## Arquivo SQL
 
-O arquivo `backend/condominio_backup.sql` contém o dump completo do banco SQLite com dados de exemplo.
+O arquivo `backend/condominio_backup.sql` contém o dump completo do banco SQLite com dados de exemplo, configure no `backend/config/settings.py` (seção comentada) e rode `python manage.py migrate`.
 
-Para MySQL, configure as variáveis no `backend/config/settings.py` (seção comentada) e rode `python manage.py migrate`.
+Para MySQL, arquivo `settings.py` já configurado.
