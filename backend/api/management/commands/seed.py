@@ -18,19 +18,17 @@ class Command(BaseCommand):
                 username='superadmin',
                 email='superadmin@condominio.com',
                 password='superadmin123',
-                # is_superuser=True, is_staff=True e is_active=True são definidos pelo create_superuser
             )
             self.stdout.write('  → superadmin criado (superuser + staff + active)')
 
         # Administrador — staff e active, mas não superuser
-        # Pode acessar o /admin/ com permissões específicas e usar endpoints de escrita na API
         if not User.objects.filter(username='admin').exists():
             admin_user = User.objects.create_user(
                 username='admin',
                 email='admin@condominio.com',
                 password='admin123',
             )
-            admin_user.is_staff = True    #acesso ao /admin/ e escrita na API
+            admin_user.is_staff = True
             admin_user.is_superuser = False
             admin_user.is_active = True
             admin_user.save()
@@ -42,7 +40,6 @@ class Command(BaseCommand):
                 username='user',
                 email='user@condominio.com',
                 password='user123',
-                # is_superuser=False, is_staff=False, is_active=True (padrão)
             )
             self.stdout.write('  → user criado (active apenas)')
 
