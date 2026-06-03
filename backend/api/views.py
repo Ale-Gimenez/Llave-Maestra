@@ -158,7 +158,6 @@ class ParcelaAcordoViewSet(viewsets.ModelViewSet):
 
 
 # Endpoints inteligentes
-
 class DashboardView(APIView):
     permission_classes = [IsAuthenticated]
 
